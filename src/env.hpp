@@ -5,7 +5,7 @@
 /*
 *   MQTT
 */
-#define ENV_MQTT_BROKER "192.168.1.101" // endereço a ligar mqtt.eclipseprojects.io
+#define ENV_MQTT_BROKER "raspberrypi.local" // endereço a ligar mqtt.eclipseprojects.io
 
 /*
 *   Network
@@ -28,7 +28,14 @@
 #define ENV_EM_ID 3//ID da estação meterológica
 
 /*
-*
+* Serial monitor debug
+*/
+#define ENV_MODBUS_DEBUG        0
+#define ENV_I2C_DEBUG           0
+
+
+/*
+*   Tasks
 */
 #define ENV_TASK_NETWORK        1
 #define ENV_TASK_MQTT           1

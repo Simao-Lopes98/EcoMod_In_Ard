@@ -38,19 +38,19 @@ namespace I2C
 
     void taskI2C(void *pvParameters)
     {
-        char ph_reading[10];
-        char ec_reading[10];
+        queues::I2C_readings_t readings;
         setup_i2c(21, 22, 100000);
         Serial.println("I2C: Booted");
 
         while (true)
         {
-            read_i2c_sensor(ENV_PH_SENS_ADDR, ph_reading);
+            read_i2c_sensor(ENV_PH_SENS_ADDR, readings.ph);
             vTaskDelay(1000/portTICK_PERIOD_MS);
-            read_i2c_sensor(ENV_EC_SENS_ADDR, ec_reading);
-            Serial.println("ph: " + String(ph_reading) + " ec: " + String(ec_reading));
-            xQueueOverwrite(queues::ph_reading, &ph_reading);
-            xQueueOverwrite(queues::ec_reading, &ec_reading);
+            read_i2c_sensor(ENV_EC_SENS_ADDR, readings.ec);
+            #if ENV_I2C_DEBUG
+                Serial.println("PH: " + String(readings.ph) + " EC: " + String(readings.ec));
+            #endif
+            xQueueOverwrite(queues::i2c_readings, &readings);
             vTaskDelay(5000 / portTICK_PERIOD_MS);
         }
     }

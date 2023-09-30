@@ -12,13 +12,26 @@ namespace queues
 
     struct STA_cred_t
     {
-        char ssid [35];
-        char password [35];
+        char ssid[35];
+        char password[35];
     };
-    
+
+    struct I2C_readings_t
+    {
+        char ph[10];
+        char ec[10];
+    };
+    struct Modbus_readings_t
+    {
+        float temperature;
+        float turbidity;
+        float COD;
+        float EM_readings[12];
+        int pump_RMP;
+    };
 
     extern QueueHandle_t data; // Mailbox
     extern QueueHandle_t sta_cred;
-    extern QueueHandle_t ph_reading;// Mailbox
-    extern QueueHandle_t ec_reading;// Mailbox
+    extern QueueHandle_t i2c_readings; // Mailbox
+    extern QueueHandle_t modbus_readings; // Mailbox
 }

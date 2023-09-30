@@ -5,8 +5,8 @@ namespace MQTT
     WiFiClient espClient;
     PubSubClient client(espClient);
 
-    char ph_reading[10];
-    char ec_reading[10];
+    queues::I2C_readings_t rcv_i2c_readings;
+    queues::Modbus_readings_t rcv_modbus_readings;
     char packet[512];
 
     void callback(char *topic, byte *payload, unsigned int length)
@@ -32,9 +32,9 @@ namespace MQTT
             // Attempt to connect
             if (client.connect(clientId.c_str()))
             {
-                Serial.println("Ola");
-                client.publish("inTopic", "Ola");
-                client.publish("EMTopic", "Ola");
+                process_data();
+                client.publish("sensors/input", packet);
+                Serial.println("MQTT: Packet sent");
             }
             else
             {
@@ -48,11 +48,13 @@ namespace MQTT
 
     void process_data()
     {
-        xQueuePeek(queues::ph_reading, &ph_reading, 100 / portTICK_PERIOD_MS);
-        xQueuePeek(queues::ec_reading, &ec_reading, 100 / portTICK_PERIOD_MS);
-        //TODO: Add the other queues
+        xQueuePeek(queues::i2c_readings, &rcv_i2c_readings, 100 / portTICK_PERIOD_MS);
+        xQueuePeek(queues::modbus_readings, &rcv_modbus_readings, 100 / portTICK_PERIOD_MS);
 
-        snprintf(packet,512, "{\"ref\":\"sensIN\", \"pH\":\"%s\", \"temperatura\":\"%.2f\", \"EC\":\"%.3s\"}", ph_reading, 10.2, ec_reading);
+        //TODO:Add EM packet
+        snprintf(packet,512, "{\"ref\":\"sensIN\", \"pH\":\"%s\", \"temperatura\":\"%.2f\", \"EC\":\"%.3s\", \"Turb\":\"%.2f\", \"COD\":\"%.2f\", \"RPM\":\"%d\" }"
+        ,rcv_i2c_readings.ph, rcv_modbus_readings.temperature, rcv_i2c_readings.ec,rcv_modbus_readings.turbidity,rcv_modbus_readings.COD,rcv_modbus_readings.pump_RMP);
+        
     }
 
     void taskMQTT(void *pvParameters) // Task de envio de parametros para o broker
@@ -71,6 +73,7 @@ namespace MQTT
 
             process_data();
             client.publish("sensors/input", packet);
+            Serial.println("MQTT: Packet sent");
             vTaskDelay(5000 / portTICK_PERIOD_MS);
         }
     }

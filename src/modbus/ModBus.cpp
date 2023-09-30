@@ -8,9 +8,11 @@ namespace ModBus
     { // Callback to monitor errors
         if (event != Modbus::EX_SUCCESS)
         { // Caso ocurrer um ERRO
-            Serial.print("Request result: 0x");
-            Serial.print(event, HEX);
-            Serial.println();
+            #if ENV_MODBUS_DEBUG
+                Serial.print("Request result: 0x");
+                Serial.print(event, HEX);
+                Serial.println();
+            #endif
         }
         return true;
     }
@@ -164,7 +166,7 @@ namespace ModBus
     int read_pump()
     {
         uint16_t reg_pump[1];
-        reg_pump[0] = 123;
+        reg_pump[0] = 0;
         // Recebe as informações da bomba
         if (!mb.slave())
         {                                                            // Para receber informação sobre a bomba
@@ -180,13 +182,8 @@ namespace ModBus
 
     void taskModbus(void *pvParameters)
     {
-
-        float temperatura_reading = 0.0;
-        float turb_reading = 0.0;
-        float COD_reading = 0.0;
-        float EM_reading[12];
-        int pump_RPM = 0;
-
+        queues::Modbus_readings_t readings;
+        
         Serial1.begin(9600, SERIAL_8N2, 16, 17); // BaudRate, 1 Start Bit 8 Data e 2 StopBit, Rx,Tx
         mb.begin(&Serial1);
         mb.master();
@@ -195,15 +192,17 @@ namespace ModBus
         while (true)
         {
             // Readings
-            temperatura_reading = read_temperature();
-            turb_reading = read_turb();
-            COD_reading = read_cod();
-            read_EM(EM_reading);
-            pump_RPM = read_pump();
+            readings.temperature = read_temperature();
+            readings.turbidity = read_turb();
+            readings.COD = read_cod();
+            read_EM(readings.EM_readings);
+            readings.pump_RMP = read_pump();
 
-            // TODO: Add a ENV for debug
-            Serial.println("Temperature: " + String(temperatura_reading) + " ,Turb: " + String(turb_reading) + " ,COD: " + String(COD_reading) + " ,RPM: " + String(pump_RPM));
+            #if ENV_MODBUS_DEBUG
+                Serial.println("Temperature: " + String(readings.temperature) + " ,Turb: " + String( readings.turbidity) + " ,COD: " + String(readings.COD) + " ,RPM: " + String(readings.pump_RMP));
+            #endif
 
+            xQueueOverwrite(queues::modbus_readings,&readings);
             vTaskDelay(5000 / portTICK_PERIOD_MS);
         }
     }
