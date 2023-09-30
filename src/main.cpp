@@ -7,6 +7,7 @@
 #include "httpServer/HTTPServer.hpp"
 #include "ota/OTA.hpp"
 #include "i2c/I2C.hpp"
+#include "modbus/ModBus.hpp"
 
 
 TaskHandle_t TaskMQTT;
@@ -14,6 +15,7 @@ TaskHandle_t TaskNetwork;
 TaskHandle_t TaskHTTPSever;
 TaskHandle_t TaskOTA;
 TaskHandle_t TaskI2C;
+TaskHandle_t TaskModBus;
 
 void setup()
 {
@@ -39,6 +41,10 @@ void setup()
 
   #if ENV_TASK_I2C
   xTaskCreate(I2C::taskI2C, "TaskI2C", 5 * 1024, NULL, 1, &TaskI2C);
+  #endif
+
+  #if ENV_TASK_MODBUS
+  xTaskCreate(ModBus::taskModbus, "TaskModbus", 5 * 1024, NULL, 1, &TaskModBus);
   #endif
 }
 

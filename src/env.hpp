@@ -20,10 +20,19 @@
 #define ENV_EC_SENS_ADDR 0x64
 
 /*
+*   ModBus
+*/
+#define ENV_PUMP_ID 2// ID da Bomba (Numero no mostrador da própria bomba)
+#define ENV_TURB_ID 40 //ID do sensor de Tubr na entrada
+#define ENV_COD_ID 1// ID da sensor de carga organica
+#define ENV_EM_ID 3//ID da estação meterológica
+
+/*
 *
 */
 #define ENV_TASK_NETWORK        1
 #define ENV_TASK_MQTT           1
-#define ENV_TASK_HTTPSERVER     1
-#define ENV_TASK_OTA            1
-#define ENV_TASK_I2C            1
+#define ENV_TASK_HTTPSERVER     0
+#define ENV_TASK_OTA            0
+#define ENV_TASK_I2C            0
+#define ENV_TASK_MODBUS         1
