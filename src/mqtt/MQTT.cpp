@@ -73,7 +73,9 @@ namespace MQTT
 
             process_data();
             client.publish("sensors/input", packet);
-            Serial.println("MQTT: Packet sent");
+            #if ENV_MQTT_DEBUG
+                Serial.println("MQTT: Packet sent");
+            #endif
             vTaskDelay(5000 / portTICK_PERIOD_MS);
         }
     }
