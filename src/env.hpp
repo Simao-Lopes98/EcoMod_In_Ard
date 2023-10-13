@@ -33,6 +33,7 @@
 #define ENV_MODBUS_DEBUG        0
 #define ENV_I2C_DEBUG           0
 #define ENV_MQTT_DEBUG          0
+#define ENV_SOLO_AP_MODE        0
 
 
 /*

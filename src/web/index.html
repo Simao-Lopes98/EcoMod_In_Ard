@@ -135,6 +135,25 @@
 				xhr.send(file);
 			}
 		}
+
+		function requestData() {
+
+			var xhr = new XMLHttpRequest();
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState == 4) {
+					if (xhr.status == 200) {
+						var response = xhr.responseText;
+						alert("Parametros recebidos: " + response);
+					} else {
+						alert("Error requesting data: " + xhr.status + " " + xhr.statusText);
+					}
+				}
+			};
+
+			xhr.open("GET", "/update/parameters", true);
+			xhr.send();
+		}
+
 	</script>
 </head>
 
@@ -153,6 +172,10 @@
 		<input type="file" id="otafile" name="otafile" />
 
 		<button id="upload" type="button" onclick="startUpload()">Upload Firmware</button>
+
+		<button id="requestData" type="button" onclick="requestData()">Request Sensor Data</button>
+
+		<button id="restart_uC" type="button" onclick="requestSoftRestart()">Request restart</button>
 
 		<div id="progress"></div>
 	</div>
