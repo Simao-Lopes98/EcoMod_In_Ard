@@ -33,6 +33,22 @@ namespace HTTPServer
         return ESP_OK;
     }
 
+    static esp_err_t update_get_handler(httpd_req_t *req)
+    {
+        queues::I2C_readings_t rcv_i2c_readings;
+        queues::Modbus_readings_t rcv_modbus_readings;
+
+        xQueuePeek(queues::i2c_readings, &rcv_i2c_readings, 10 / portTICK_PERIOD_MS);
+        xQueuePeek(queues::modbus_readings, &rcv_modbus_readings, 10 / portTICK_PERIOD_MS);
+
+        char packet[400];
+        snprintf(packet, 400, "pH: %s \n Temperatura: %.2f\n EC: %.3s\n Turbidez: %.2f\n Carga Orgânica: %.2f\n RPM: %d\n", 
+        rcv_i2c_readings.ph, rcv_modbus_readings.temperature, rcv_i2c_readings.ec, rcv_modbus_readings.turbidity, rcv_modbus_readings.COD, rcv_modbus_readings.pump_RMP);
+        
+        httpd_resp_send(req, (const char *)packet, strlen(packet));
+        return ESP_OK;
+    }
+
     static esp_err_t update_post_handler(httpd_req_t *req)
     {
         queues::STA_cred_t inc_cred;
@@ -73,6 +89,13 @@ namespace HTTPServer
             .handler = update_post_handler,
             .user_ctx = NULL};
         ESP_ERROR_CHECK(httpd_register_uri_handler(http_server, &update_post_cred));
+
+        const httpd_uri_t update_get_param = {
+            .uri = "/update/parameters",
+            .method = HTTP_GET,
+            .handler = update_get_handler,
+            .user_ctx = NULL};
+        ESP_ERROR_CHECK(httpd_register_uri_handler(http_server, &update_get_param));
     }
 
     void taskHTTPServer(void *pvParameters)
@@ -81,6 +104,7 @@ namespace HTTPServer
         httpd_config_t config = HTTPD_DEFAULT_CONFIG();
         ESP_ERROR_CHECK(httpd_start(&http_server, &config));
         registerEndpoints();
+
         Serial.println("HTTPServer: Booted");
         while (true)
         {

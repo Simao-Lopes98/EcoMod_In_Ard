@@ -5,6 +5,7 @@ namespace Network
 
     void setup_wifi()
     {
+        #if !ENV_SOLO_AP_MODE
         Serial.println();
         Serial.print("Connecting to STA");
         Serial.println(ENV_SSID);
@@ -14,16 +15,18 @@ namespace Network
 
         while (WiFi.status() != WL_CONNECTED)
         {
+            Serial.println("Network: Trying to connect");
         }
         Serial.println("");
         Serial.println("WiFi connected");
         Serial.println("IP address: ");
         Serial.println(WiFi.localIP());
+        #endif
 
-        Serial.print("Starting AP");
-        Serial.println("ESP1234");
+        Serial.println("Starting AP");
+        Serial.println("ESP_EcoModZHC");
 
-        WiFi.softAP("ESP1234", "123455789");
+        WiFi.softAP("ESP_EcoModZHC", "123455789");
 
         Serial.println("");
         Serial.println("Connected to WiFi");
