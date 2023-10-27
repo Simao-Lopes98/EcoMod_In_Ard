@@ -200,6 +200,8 @@ namespace ModBus
 
             #if ENV_MODBUS_DEBUG
                 Serial.println("Temperature: " + String(readings.temperature) + " ,Turb: " + String( readings.turbidity) + " ,COD: " + String(readings.COD) + " ,RPM: " + String(readings.pump_RMP));
+                Serial.printf("AWD:%.2f, AWS:%.2f, AT:%.2f, AH:%.2f, AP:%.2f, RF:%.2f, Rad:%.2f, UV:%.2f\n"
+                ,readings.EM_readings[1],readings.EM_readings[4],readings.EM_readings[6],readings.EM_readings[7],readings.EM_readings[8],readings.EM_readings[9],readings.EM_readings[10],readings.EM_readings[11]);
             #endif
 
             xQueueOverwrite(queues::modbus_readings,&readings);
