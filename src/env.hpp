@@ -34,15 +34,15 @@
 #define ENV_MODBUS_DEBUG        0
 #define ENV_I2C_DEBUG           0
 #define ENV_MQTT_DEBUG          0
-#define ENV_SOLO_AP_MODE        0
+#define ENV_SOLO_AP_MODE        1
 
 
 /*
 *   Tasks
 */
 #define ENV_TASK_NETWORK        1
-#define ENV_TASK_MQTT           1
+#define ENV_TASK_MQTT           0
 #define ENV_TASK_HTTPSERVER     1
-#define ENV_TASK_OTA            1
-#define ENV_TASK_I2C            1
-#define ENV_TASK_MODBUS         1
+#define ENV_TASK_OTA            0
+#define ENV_TASK_I2C            0
+#define ENV_TASK_MODBUS         0

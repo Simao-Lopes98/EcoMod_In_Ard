@@ -154,6 +154,24 @@
 			xhr.send();
 		}
 
+		function requestSoftRestart() {
+
+			var xhr = new XMLHttpRequest();
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState == 4) {
+					if (xhr.status == 200) {
+						var response = xhr.responseText;
+						alert("Rebooting device: " + response);
+					} else {
+						alert("Error rebooting device: " + xhr.status + " " + xhr.statusText);
+					}
+				}
+			};
+
+			xhr.open("POST", "/reboot", true);
+			xhr.send();
+		}
+
 	</script>
 </head>
 
