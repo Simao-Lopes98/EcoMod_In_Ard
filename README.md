@@ -1,2 +1,2 @@
-# EcoMod_In_Ard
-Ecomod Input uController source code
+# EcoModZHC Input MCU
+Ecomod Input MCU source code
