@@ -43,6 +43,6 @@
 #define ENV_TASK_NETWORK        1
 #define ENV_TASK_MQTT           1
 #define ENV_TASK_HTTPSERVER     1
-#define ENV_TASK_OTA            1
-#define ENV_TASK_I2C            1
-#define ENV_TASK_MODBUS         1
+#define ENV_TASK_OTA            0
+#define ENV_TASK_I2C            0
+#define ENV_TASK_MODBUS         0

@@ -154,11 +154,29 @@
 			xhr.send();
 		}
 
+		function requestSoftRestart() {
+
+			var xhr = new XMLHttpRequest();
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState == 4) {
+					if (xhr.status == 200) {
+						var response = xhr.responseText;
+						alert("Rebooting device: " + response);
+					} else {
+						alert("Error rebooting device: " + xhr.status + " " + xhr.statusText);
+					}
+				}
+			};
+
+			xhr.open("POST", "/reboot", true);
+			xhr.send();
+		}
+
 	</script>
 </head>
 
 <body>
-	<h1>EcoMod Updater</h1>
+	<h1>EcoModZHC Input MCU</h1>
 	<div class="container">
 		<label for="ssid">SSID:</label>
 		<input type="text" id="ssid" name="ssid" placeholder="Enter SSID" />

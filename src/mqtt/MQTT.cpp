@@ -57,17 +57,14 @@ namespace MQTT
         {
             xQueuePeek(queues::modbus_readings, &rcv_modbus_readings, 100 / portTICK_PERIOD_MS);
         }
-
         //Submerged sensors
         snprintf(packet,512, "{\"ref\":\"sensIN\", \"pH\":\"%s\", \"temperatura\":\"%.2f\", \"EC\":\"%.3s\", \"Turb\":\"%.2f\", \"COD\":\"%.2f\", \"RPM\":\"%d\" }"
         ,rcv_i2c_readings.ph, rcv_modbus_readings.temperature, rcv_i2c_readings.ec,rcv_modbus_readings.turbidity,rcv_modbus_readings.COD,rcv_modbus_readings.pump_RMP);
-        
         //EM
-        snprintf(EMPacket,512, "{\"ref\":\"estacaoM\", \"AWD\":\"%.2f\", \"AWS\":\"%.2f\", \"AT\":\"%.2f\", \"AH\":\"%.2f\", \"AP\":\"%.2f\", \"RF\":\"%.2f\", \"Rad\":\"%.2f\", \"UV\":\"%.2f\" }"
-        ,rcv_modbus_readings.EM_readings[1],rcv_modbus_readings.EM_readings[4],rcv_modbus_readings.EM_readings[6],rcv_modbus_readings.EM_readings[7],rcv_modbus_readings.EM_readings[8],rcv_modbus_readings.EM_readings[9],rcv_modbus_readings.EM_readings[10],rcv_modbus_readings.EM_readings[11]);
-
-    
+        snprintf(EMPacket,512, "{\"ref\":\"EM\", \"AWD\":\"%.2f\", \"AWS\":\"%.2f\", \"AT\":\"%.2f\", \"AH\":\"%.2f\", \"AP\":\"%.2f\", \"RF\":\"%.2f\", \"UV\":\"%.2f\", \"Rad\":\"%.2f\" }"
+        ,rcv_modbus_readings.EM_readings[1],rcv_modbus_readings.EM_readings[4],rcv_modbus_readings.EM_readings[6],rcv_modbus_readings.EM_readings[7],rcv_modbus_readings.EM_readings[8],rcv_modbus_readings.EM_readings[9],rcv_modbus_readings.EM_readings[11],rcv_modbus_readings.EM_readings[10]);
     }
+    
     void initialize_values()
     {
         strcpy(rcv_i2c_readings.ec,"0");
