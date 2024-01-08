@@ -87,7 +87,7 @@ namespace HTTPServer
         const httpd_uri_t update_post_fw = {
             .uri = "/update/firmware",
             .method = HTTP_POST,
-            .handler = OTA::ota_update_post_handler, // TODO: Edit
+            .handler = OTA::ota_update_post_handler,
             .user_ctx = NULL};
         ESP_ERROR_CHECK(httpd_register_uri_handler(http_server, &update_post_fw));
 
