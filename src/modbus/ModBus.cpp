@@ -8,11 +8,11 @@ namespace ModBus
     { // Callback to monitor errors
         if (event != Modbus::EX_SUCCESS)
         { // Caso ocurrer um ERRO
-            #if ENV_MODBUS_DEBUG
-                Serial.print("Request result: 0x");
-                Serial.print(event, HEX);
-                Serial.println();
-            #endif
+#if ENV_MODBUS_DEBUG
+            Serial.print("Request result: 0x");
+            Serial.print(event, HEX);
+            Serial.println();
+#endif
         }
         return true;
     }
@@ -180,10 +180,23 @@ namespace ModBus
         return (int)reg_pump[0];
     }
 
+    void write_rpm_pump(uint16_t RPM)
+    {
+        if (!mb.slave())
+        {                                                // Para enviar informações
+            mb.writeHreg(ENV_PUMP_ID, REG_PUMP_RPM, RPM, cb); // ID da bomba, registo (velocidade), velocidade e evento
+            while (mb.slave())
+            { // Check if transaction is active
+                mb.task();
+                delay(10);
+            }
+        }
+    }
+
     void taskModbus(void *pvParameters)
     {
         queues::Modbus_readings_t readings;
-        
+
         Serial1.begin(9600, SERIAL_8N2, 16, 17); // BaudRate, 1 Start Bit 8 Data e 2 StopBit, Rx,Tx
         mb.begin(&Serial1);
         mb.master();
@@ -191,6 +204,18 @@ namespace ModBus
         Serial.println("MobBus: Booted");
         while (true)
         {
+            // Change Pump RPM
+            if (uxQueueMessagesWaiting(queues::pump_rpm))
+            {
+                uint16_t RPM = 0;
+                xQueueReceive(queues::pump_rpm, &RPM, 10 / portTICK_PERIOD_MS);
+                
+                #if ENV_MODBUS_DEBUG
+                    Serial.println("Updating pump RPM to: " String(RPM));
+                #endif
+                write_rpm_pump(RPM);
+            }
+
             // Readings
             readings.temperature = read_temperature();
             readings.turbidity = read_turb();
@@ -199,12 +224,11 @@ namespace ModBus
             readings.pump_RMP = read_pump();
 
             #if ENV_MODBUS_DEBUG
-                Serial.println("Temperature: " + String(readings.temperature) + " ,Turb: " + String( readings.turbidity) + " ,COD: " + String(readings.COD) + " ,RPM: " + String(readings.pump_RMP));
-                Serial.printf("AWD:%.2f, AWS:%.2f, AT:%.2f, AH:%.2f, AP:%.2f, RF:%.2f, Rad:%.2f, UV:%.2f\n"
-                ,readings.EM_readings[1],readings.EM_readings[4],readings.EM_readings[6],readings.EM_readings[7],readings.EM_readings[8],readings.EM_readings[9],readings.EM_readings[10],readings.EM_readings[11]);
+                Serial.println("Temperature: " + String(readings.temperature) + " ,Turb: " + String(readings.turbidity) + " ,COD: " + String(readings.COD) + " ,RPM: " + String(readings.pump_RMP));
+                Serial.printf("AWD:%.2f, AWS:%.2f, AT:%.2f, AH:%.2f, AP:%.2f, RF:%.2f, Rad:%.2f, UV:%.2f\n", readings.EM_readings[1], readings.EM_readings[4], readings.EM_readings[6], readings.EM_readings[7], readings.EM_readings[8], readings.EM_readings[9], readings.EM_readings[10], readings.EM_readings[11]);
             #endif
 
-            xQueueOverwrite(queues::modbus_readings,&readings);
+            xQueueOverwrite(queues::modbus_readings, &readings);
             vTaskDelay(5000 / portTICK_PERIOD_MS);
         }
     }

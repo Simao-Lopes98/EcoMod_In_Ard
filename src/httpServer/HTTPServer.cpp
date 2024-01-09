@@ -75,6 +75,27 @@ namespace HTTPServer
         return ESP_OK;
     }
 
+    static esp_err_t rpm_post_handler(httpd_req_t *req)
+    {
+        char *req_body = (char *)malloc((req->content_len + 1) * sizeof(char));
+        if (esp_err_t res = read_req_body(req, req_body) != ESP_OK)
+        {
+            return res;
+        }
+        uint16_t RPM = 0;
+        cJSON *obj = cJSON_Parse(req_body);
+        RPM = (uint16_t)atoi(cJSON_GetObjectItem(obj, "rpm")->valuestring);
+        xQueueSend(queues::pump_rpm, &RPM, 15 / portTICK_PERIOD_MS);
+
+        cJSON_Delete(obj);
+        free(req_body);
+        return ESP_OK;
+    }
+
+    // changeRPM
+
+
+
     void registerEndpoints()
     {
         const httpd_uri_t index_get = {
@@ -111,6 +132,13 @@ namespace HTTPServer
             .handler = reboot_post_handler,
             .user_ctx = NULL};
         ESP_ERROR_CHECK(httpd_register_uri_handler(http_server, &reboot_post_param));
+
+        const httpd_uri_t rpm_post_param = {
+            .uri = "/changeRPM",
+            .method = HTTP_POST,
+            .handler = rpm_post_handler,
+            .user_ctx = NULL};
+        ESP_ERROR_CHECK(httpd_register_uri_handler(http_server, &rpm_post_param));
     }
 
     void taskHTTPServer(void *pvParameters)

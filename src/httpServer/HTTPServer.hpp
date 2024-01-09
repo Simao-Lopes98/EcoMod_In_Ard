@@ -20,6 +20,8 @@ namespace HTTPServer
 
     static esp_err_t reboot_post_handler(httpd_req_t *req);
 
+    static esp_err_t rpm_post_handler(httpd_req_t *req);
+
     void registerEndpoints();
 
     void taskHTTPServer(void *pvParameters);
