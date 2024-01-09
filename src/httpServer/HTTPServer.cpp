@@ -83,12 +83,10 @@ namespace HTTPServer
             return res;
         }
         uint16_t RPM = 0;
-
-        Serial.println(req_body);
         cJSON *obj = cJSON_Parse(req_body);
         RPM = (uint16_t)atoi(cJSON_GetObjectItem(obj, "rpm")->valuestring);
         xQueueSend(queues::pump_rpm, &RPM, 15 / portTICK_PERIOD_MS);
-        
+
         cJSON_Delete(obj);
         free(req_body);
         return ESP_OK;

@@ -16,6 +16,6 @@ namespace queues
         sta_cred = xQueueCreate(2, sizeof(STA_cred_t));
         i2c_readings = xQueueCreate(1, sizeof(I2C_readings_t));
         modbus_readings = xQueueCreate(1, sizeof(Modbus_readings_t));
-        modbus_readings = xQueueCreate(2, sizeof(uint16_t));
+        pump_rpm = xQueueCreate(2, sizeof(uint16_t));
     }
 }
