@@ -191,6 +191,17 @@ namespace ModBus
         Serial.println("MobBus: Booted");
         while (true)
         {
+            //Change Pump RPM
+            if(uxQueueMessagesWaiting(queues::pump_rpm))
+            {
+                uint16_t RPM = 0;
+                xQueueReceive(queues::pump_rpm, &RPM,10/portTICK_PERIOD_MS);
+                Serial.println(RPM);
+                #if ENV_MODBUS_DEBUG
+                    Serial.println(RPM);
+                #endif
+            }
+
             // Readings
             readings.temperature = read_temperature();
             readings.turbidity = read_turb();
