@@ -6,6 +6,7 @@
 #include <ModbusRTU.h>
 #include "../env.hpp"
 #include "../queues/queues.hpp"
+#include <Log.hpp>
 
 #define REG_PUMP_RPM 3100// Escrever/Ler RPM da bomba
 #define REG_TURB_START_MES 0x0001 // Inicia a medição sensor tubr

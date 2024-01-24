@@ -2,6 +2,8 @@
 
 namespace OTA
 {
+    const char *TAG = "OTA";
+
     esp_err_t ota_update_post_handler(httpd_req_t *req)
     {
         char buf[1000];
@@ -9,11 +11,11 @@ namespace OTA
         int remaining = req->content_len;
 
         const esp_partition_t *ota_partition = esp_ota_get_next_update_partition(NULL);
-        Serial.println("OTA: Partition to update: " + String(ota_partition->label));
+        service_log(TAG,"Partition to update: %s",(ota_partition->label));
 
         esp_ota_begin(ota_partition, 1000000, &ota_handle);// 
 
-        Serial.println("Starting the uptade");
+        service_log(TAG,"Starting the uptade");
         int time_out_counter = 0;
 
         while (remaining > 0)
@@ -25,7 +27,7 @@ namespace OTA
             {
                 if(time_out_counter < 5)
                 {
-                    Serial.println("OTA: Timeout");
+                    service_log(TAG, "Timeout");
                     time_out_counter++;
                     continue;
                 }else{
@@ -81,7 +83,7 @@ namespace OTA
 
         /* Mark current app as valid */
         const esp_partition_t *partition = esp_ota_get_running_partition();
-        Serial.println("OTA: Currently running partition: "+ String(partition->label));
+        service_log(TAG, "Currently running partition: %s", (partition->label));
 
         esp_ota_img_states_t ota_state;
         if (esp_ota_get_state_partition(partition, &ota_state) == ESP_OK)
@@ -95,13 +97,13 @@ namespace OTA
         const esp_partition_t *ota_partition = esp_ota_get_next_update_partition(NULL);
         if (ota_partition == NULL)
         {
-            Serial.println("OTA: Invalid OTA partition");
+            service_log(TAG,"Invalid OTA partition");
         }
         else
         {
-            Serial.println("OTA: Partition to update "+ String(ota_partition->label));
+            service_log(TAG,"Partition to update: %s",(ota_partition->label));
         }
-       Serial.println("OTA: Booted");
+       service_log(TAG,"Booted");
 
         while (true)
         {

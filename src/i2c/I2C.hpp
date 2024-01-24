@@ -4,6 +4,7 @@
 #include <Wire.h>
 #include "../env.hpp"
 #include "../queues/queues.hpp"
+#include <Log.hpp>
 
 namespace I2C
 {

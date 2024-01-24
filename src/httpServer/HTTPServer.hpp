@@ -6,6 +6,7 @@
 #include <esp_http_server.h>
 #include <cJSON.h>
 #include "../ota/OTA.hpp"
+#include <Log.hpp>
 
 namespace HTTPServer
 {

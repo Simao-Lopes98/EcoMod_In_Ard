@@ -2,6 +2,7 @@
 
 namespace I2C
 {
+    const char *TAG = "I2C";
     void setup_i2c(int SDA, int SCL, int CLK)
     {
         Wire.begin(SDA, SCL, CLK); // SDA, SCL , CLK (I2C)
@@ -40,7 +41,7 @@ namespace I2C
     {
         queues::I2C_readings_t readings;
         setup_i2c(21, 22, 100000);
-        Serial.println("I2C: Booted");
+        service_log(TAG, "Booted");
 
         while (true)
         {
@@ -48,7 +49,7 @@ namespace I2C
             vTaskDelay(1000/portTICK_PERIOD_MS);
             read_i2c_sensor(ENV_EC_SENS_ADDR, readings.ec);
             #if ENV_I2C_DEBUG
-                Serial.println("PH: " + String(readings.ph) + " EC: " + String(readings.ec));
+                service_log(TAG,"PH: " + String(readings.ph) + " EC: " + String(readings.ec));
             #endif
             xQueueOverwrite(queues::i2c_readings, &readings);
             vTaskDelay(5000 / portTICK_PERIOD_MS);

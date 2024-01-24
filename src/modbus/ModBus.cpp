@@ -3,16 +3,17 @@
 namespace ModBus
 {
     ModbusRTU mb; // Class
+    const char *TAG = "ModBus";
 
     bool cb(Modbus::ResultCode event, uint16_t transactionId, void *data)
     { // Callback to monitor errors
         if (event != Modbus::EX_SUCCESS)
         { // Caso ocurrer um ERRO
-#if ENV_MODBUS_DEBUG
-            Serial.print("Request result: 0x");
+            #if ENV_MODBUS_DEBUG
+            service_log(TAG, "Request result: 0x");
             Serial.print(event, HEX);
             Serial.println();
-#endif
+            #endif
         }
         return true;
     }
@@ -201,7 +202,7 @@ namespace ModBus
         mb.begin(&Serial1);
         mb.master();
 
-        Serial.println("MobBus: Booted");
+        service_log(TAG, "Booted");
         while (true)
         {
             // Change Pump RPM
@@ -211,7 +212,7 @@ namespace ModBus
                 xQueueReceive(queues::pump_rpm, &RPM, 10 / portTICK_PERIOD_MS);
                 
                 #if ENV_MODBUS_DEBUG
-                    Serial.println("Updating pump RPM to: " String(RPM));
+                    service_log(TAG,"Updating pump RPM to: " String(RPM));
                 #endif
                 write_rpm_pump(RPM);
             }
@@ -224,8 +225,8 @@ namespace ModBus
             readings.pump_RMP = read_pump();
 
             #if ENV_MODBUS_DEBUG
-                Serial.println("Temperature: " + String(readings.temperature) + " ,Turb: " + String(readings.turbidity) + " ,COD: " + String(readings.COD) + " ,RPM: " + String(readings.pump_RMP));
-                Serial.printf("AWD:%.2f, AWS:%.2f, AT:%.2f, AH:%.2f, AP:%.2f, RF:%.2f, Rad:%.2f, UV:%.2f\n", readings.EM_readings[1], readings.EM_readings[4], readings.EM_readings[6], readings.EM_readings[7], readings.EM_readings[8], readings.EM_readings[9], readings.EM_readings[10], readings.EM_readings[11]);
+                service_log(TAG,"Temperature: " + String(readings.temperature) + " ,Turb: " + String(readings.turbidity) + " ,COD: " + String(readings.COD) + " ,RPM: " + String(readings.pump_RMP));
+                service_log(TAG,"AWD:%.2f, AWS:%.2f, AT:%.2f, AH:%.2f, AP:%.2f, RF:%.2f, Rad:%.2f, UV:%.2f\n", readings.EM_readings[1], readings.EM_readings[4], readings.EM_readings[6], readings.EM_readings[7], readings.EM_readings[8], readings.EM_readings[9], readings.EM_readings[10], readings.EM_readings[11]);
             #endif
 
             xQueueOverwrite(queues::modbus_readings, &readings);

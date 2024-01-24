@@ -2,7 +2,7 @@
 
 namespace HTTPServer
 {
-
+    const char *TAG = "HTTPServer";
     httpd_handle_t http_server = NULL;
 
     esp_err_t read_req_body(httpd_req_t *req, char *buf)
@@ -65,7 +65,7 @@ namespace HTTPServer
         {
             return res;
         }
-        Serial.println(req_body);
+        service_log(TAG,"%s",req_body);
         cJSON *obj = cJSON_Parse(req_body);
         strcpy(inc_cred.ssid, cJSON_GetObjectItem(obj, "ssid")->valuestring);
         strcpy(inc_cred.password, cJSON_GetObjectItem(obj, "password")->valuestring);
@@ -148,7 +148,7 @@ namespace HTTPServer
         ESP_ERROR_CHECK(httpd_start(&http_server, &config));
         registerEndpoints();
 
-        Serial.println("HTTPServer: Booted");
+       service_log(TAG, "Booted");
         while (true)
         {
             vTaskDelay(5000 / portTICK_PERIOD_MS);

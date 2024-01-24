@@ -9,24 +9,22 @@ namespace MQTT
     queues::Modbus_readings_t rcv_modbus_readings;
     char packet[512];
     char EMPacket[512];
+    const char *TAG = "MQTT";
 
     void callback(char *topic, byte *payload, unsigned int length)
     {
-        Serial.print("Message arrived [");
-        Serial.print(topic);
-        Serial.print("] ");
+        service_log(TAG, "Message arrived on topic[ %s ]",topic);
         for (int i = 0; i < length; i++)
         {
-            Serial.print((char)payload[i]);
+            // Serial.print((char)payload[i]);
         }
-        Serial.println();
     }
 
     void reconnect()
     {
         while (!client.connected())
         {
-            Serial.print("Attempting MQTT connection...");
+            service_log(TAG,"Attempting MQTT connection...");
             // Create a random client ID
             String clientId = "ESP32-Simao";
             clientId += String(random(0xffff), HEX);
@@ -35,13 +33,13 @@ namespace MQTT
             {
                 process_data();
                 client.publish("sensors/input", packet);
-                Serial.println("MQTT: Packet sent");
+                service_log(TAG,"MQTT: Packet sent");
             }
             else
             {
-                Serial.print("failed, rc=");
+                service_log(TAG,"failed, rc=");
                 Serial.print(client.state());
-                Serial.println(" try again in 5 seconds");
+                service_log(TAG," try again in 5 seconds");
                 vTaskDelay(2000 / portTICK_PERIOD_MS);
             }
         }
@@ -93,7 +91,7 @@ namespace MQTT
         client.setServer(ENV_MQTT_BROKER, 1883);
         client.setCallback(callback);
         initialize_values();
-        Serial.println("MQTT: Booted");
+        service_log(TAG, "Booted");
         while (true)
         {
             if (!client.connected())

@@ -5,6 +5,7 @@
 #include <WiFi.h>
 #include "../env.hpp"
 #include "../queues/queues.hpp"
+#include <Log.hpp>
 
 namespace MQTT
 {
