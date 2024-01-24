@@ -4,6 +4,10 @@
 #include <WiFi.h>
 #include "../env.hpp"
 #include "../queues/queues.hpp"
+#include "esp_system.h"
+#include "nvs_flash.h"
+#include "nvs.h"
+#include <Log.hpp>
 
 namespace Network
 {

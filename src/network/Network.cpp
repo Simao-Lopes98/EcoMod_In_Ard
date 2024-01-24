@@ -3,27 +3,67 @@
 namespace Network
 {
 
+    esp_err_t write_cred_nvs(const char *newSsid, const char *newPassword)
+    {
+        
+        const char *key_word_ssid = "creds_newSsid";
+        const char *key_word_pass = "creds_newPass";
+        nvs_handle_t my_handle;
+
+        //Save SSID
+        esp_err_t err = nvs_open(key_word_ssid, NVS_READWRITE, &my_handle);
+        if (err != ESP_OK) {
+            Serial.printf("Error (%s) opening NVS handle!\n", esp_err_to_name(err));
+            return err;
+        }
+        nvs_set_str(my_handle,key_word_ssid,newSsid);
+        err = nvs_commit(my_handle);
+        if (err != ESP_OK)
+        {
+            Serial.printf("Error saving new SSID");
+            return err;
+        }
+        nvs_close(my_handle);
+        
+        //Save Password
+        esp_err_t err = nvs_open(key_word_pass, NVS_READWRITE, &my_handle);
+        if (err != ESP_OK) {
+            Serial.printf("Error (%s) opening NVS handle!\n", esp_err_to_name(err));
+            return err;
+        }
+        nvs_set_str(my_handle,key_word_pass,newPassword);
+        err = nvs_commit(my_handle);
+        if (err != ESP_OK)
+        {
+            Serial.printf("Error saving new Password");
+            return err;
+        }
+        nvs_close(my_handle);
+        
+        return err;
+    }
+
+    char *read_SSID_nvs()
+    {
+
+    }
+
+    char *read_Pass_nvs()
+    {
+
+    }
+
     void setup_wifi()
     {
-        #if !ENV_SOLO_AP_MODE
-        Serial.println();
-        Serial.print("Connecting to STA");
-        Serial.println(ENV_SSID);
+        esp_err_t err = nvs_flash_init();
+        if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+            // NVS partition was truncated and needs to be erased
+            // Retry nvs_flash_init
+            ESP_ERROR_CHECK(nvs_flash_erase());
+            err = nvs_flash_init();
+        }
 
         WiFi.mode(WIFI_AP_STA);
-        WiFi.begin(ENV_SSID, ENV_PASSWORD);
-
-        while (WiFi.status() != WL_CONNECTED)
-        {
-            Serial.println("Network: Trying to connect");
-            vTaskDelay(750/portTICK_PERIOD_MS);
-        }
-        Serial.println("");
-        Serial.println("WiFi connected");
-        Serial.println("IP address: ");
-        Serial.println(WiFi.localIP());
-        #endif
-
         Serial.println("Starting AP");
         Serial.println(ENV_AP_SSID);
 
@@ -33,6 +73,24 @@ namespace Network
         Serial.println("Connected to WiFi");
         Serial.print("AP IP address: ");
         Serial.println(WiFi.softAPIP());
+
+        #if !ENV_SOLO_AP_MODE
+            Serial.println();
+            Serial.print("Connecting to STA");
+            Serial.println(ENV_SSID);
+
+            WiFi.begin(ENV_SSID, ENV_PASSWORD);
+
+            while (WiFi.status() != WL_CONNECTED)
+            {
+                Serial.println("Network: Trying to connect");
+                vTaskDelay(750/portTICK_PERIOD_MS);
+            }
+            Serial.println("");
+            Serial.println("WiFi connected");
+            Serial.println("IP address: ");
+            Serial.println(WiFi.localIP());
+        #endif
     }
 
     void change_STA_cred(const char *newSsid, const char *newPassword)
