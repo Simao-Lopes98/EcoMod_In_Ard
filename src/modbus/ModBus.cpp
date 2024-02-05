@@ -200,6 +200,7 @@ namespace ModBus
         Serial1.begin(9600, SERIAL_8N2, 16, 17); // BaudRate, 1 Start Bit 8 Data e 2 StopBit, Rx,Tx
         mb.begin(&Serial1);
         mb.master();
+        uint16_t RPM = 0;
 
         Serial.println("MobBus: Booted");
         while (true)
@@ -207,7 +208,6 @@ namespace ModBus
             // Change Pump RPM
             if (uxQueueMessagesWaiting(queues::pump_rpm))
             {
-                uint16_t RPM = 0;
                 xQueueReceive(queues::pump_rpm, &RPM, 10 / portTICK_PERIOD_MS);
                 
                 #if ENV_MODBUS_DEBUG
