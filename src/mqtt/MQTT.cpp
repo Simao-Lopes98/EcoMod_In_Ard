@@ -35,7 +35,13 @@ namespace MQTT
             {
                 process_data();
                 client.publish("sensors/input", packet);
-                Serial.println("MQTT: Packet sent");
+                #if ENV_MQTT_DEBUG
+                    Serial.printf("MQTT: Packet sent: %s",packet);
+                #endif
+                client.publish("sensors/EM", EMPacket);
+                #if ENV_MQTT_DEBUG
+                    Serial.printf("MQTT: Packet sent: %s",EMPacket);
+                #endif
             }
             else
             {
