@@ -42,8 +42,8 @@ namespace HTTPServer
         xQueuePeek(queues::modbus_readings, &rcv_modbus_readings, 10 / portTICK_PERIOD_MS);
 
         char packet[400];
-        snprintf(packet, 400, "pH: %s \n Temperatura: %.2f\n EC: %.3s\n Turbidez: %.2f\n Carga Orgânica: %.2f\n RPM: %d\n", 
-        rcv_i2c_readings.ph, rcv_modbus_readings.temperature, rcv_i2c_readings.ec, rcv_modbus_readings.turbidity, rcv_modbus_readings.COD, rcv_modbus_readings.pump_RMP);
+        snprintf(packet, 400, "pH: %s \n Temperatura: %.2f\n EC: %.3s\n Turbidez: %.2f\n Carga Orgânica: %.2f\n", 
+        rcv_i2c_readings.ph, rcv_modbus_readings.temperature, rcv_i2c_readings.ec, rcv_modbus_readings.turbidity, rcv_modbus_readings.COD);
         
         httpd_resp_send(req, (const char *)packet, strlen(packet));
         return ESP_OK;
