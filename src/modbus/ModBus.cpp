@@ -8,11 +8,11 @@ namespace ModBus
     { // Callback to monitor errors
         if (event != Modbus::EX_SUCCESS)
         { // Caso ocurrer um ERRO
-#if ENV_MODBUS_DEBUG
+        #if ENV_MODBUS_DEBUG
             Serial.print("Request result: 0x");
             Serial.print(event, HEX);
             Serial.println();
-#endif
+        #endif
         }
         return true;
     }
@@ -205,27 +205,24 @@ namespace ModBus
         Serial.println("MobBus: Booted");
         while (true)
         {
-            // Change Pump RPM
-            if (uxQueueMessagesWaiting(queues::pump_rpm))
-            {
-                xQueueReceive(queues::pump_rpm, &RPM, 10 / portTICK_PERIOD_MS);
+            // Change Pump RPM - Function removed as the PUMP is not controlled by this uC
+            // if (uxQueueMessagesWaiting(queues::pump_rpm))
+            // {
+            //     xQueueReceive(queues::pump_rpm, &RPM, 10 / portTICK_PERIOD_MS);
                 
-                #if ENV_MODBUS_DEBUG
-                    Serial.println("Updating pump RPM to: " String(RPM));
-                #endif
-                write_rpm_pump(RPM);
-            }
+            //     #if ENV_MODBUS_DEBUG
+            //         Serial.println("Updating pump RPM to: " String(RPM));
+            //     #endif
+            //     write_rpm_pump(RPM);
+            // }
 
             // Readings
             readings.temperature = read_temperature();
             readings.turbidity = read_turb();
             readings.COD = read_cod();
-            read_EM(readings.EM_readings);
-            readings.pump_RMP = read_pump();
 
             #if ENV_MODBUS_DEBUG
-                Serial.println("Temperature: " + String(readings.temperature) + " ,Turb: " + String(readings.turbidity) + " ,COD: " + String(readings.COD) + " ,RPM: " + String(readings.pump_RMP));
-                Serial.printf("AWD:%.2f, AWS:%.2f, AT:%.2f, AH:%.2f, AP:%.2f, RF:%.2f, Rad:%.2f, UV:%.2f\n", readings.EM_readings[1], readings.EM_readings[4], readings.EM_readings[6], readings.EM_readings[7], readings.EM_readings[8], readings.EM_readings[9], readings.EM_readings[10], readings.EM_readings[11]);
+                Serial.println("Temperature: " + String(readings.temperature) + " ,Turb: " + String(readings.turbidity) + " ,COD: " + String(readings.COD));
             #endif
 
             xQueueOverwrite(queues::modbus_readings, &readings);

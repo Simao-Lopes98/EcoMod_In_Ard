@@ -7,6 +7,7 @@
 */
 #define ENV_MQTT_BROKER "raspberrypi.local" // endereço a ligar
 #define ENV_SEND_PERIOD_SEC 65
+#define ENV_IN_SENSORS_TOPIC "sensors/EM"
 
 /*
 *   Network
