@@ -8,7 +8,6 @@ namespace MQTT
     queues::I2C_readings_t rcv_i2c_readings;
     queues::Modbus_readings_t rcv_modbus_readings;
     char packet[512];
-    char EMPacket[512];
 
     void callback(char *topic, byte *payload, unsigned int length)
     {
@@ -38,10 +37,6 @@ namespace MQTT
                 #if ENV_MQTT_DEBUG
                     Serial.printf("MQTT: Packet sent: %s",packet);
                 #endif
-                client.publish("sensors/EM", EMPacket);
-                #if ENV_MQTT_DEBUG
-                    Serial.printf("MQTT: Packet sent: %s",EMPacket);
-                #endif
             }
             else
             {
@@ -64,11 +59,8 @@ namespace MQTT
             xQueuePeek(queues::modbus_readings, &rcv_modbus_readings, 100 / portTICK_PERIOD_MS);
         }
         //Submerged sensors
-        snprintf(packet,512, "{\"ref\":\"sensIN\", \"pH\":\"%s\", \"temperatura\":\"%.2f\", \"EC\":\"%.3s\", \"Turb\":\"%.2f\", \"COD\":\"%.2f\", \"RPM\":\"%d\" }"
-        ,rcv_i2c_readings.ph, rcv_modbus_readings.temperature, rcv_i2c_readings.ec,rcv_modbus_readings.turbidity,rcv_modbus_readings.COD,rcv_modbus_readings.pump_RMP);
-        //EM
-        snprintf(EMPacket,512, "{\"ref\":\"EM\", \"AWD\":\"%.2f\", \"AWS\":\"%.2f\", \"AT\":\"%.2f\", \"AH\":\"%.2f\", \"AP\":\"%.2f\", \"RF\":\"%.2f\", \"UV\":\"%.2f\", \"Rad\":\"%.2f\" }"
-        ,rcv_modbus_readings.EM_readings[1],rcv_modbus_readings.EM_readings[4],rcv_modbus_readings.EM_readings[6],rcv_modbus_readings.EM_readings[7],rcv_modbus_readings.EM_readings[8],rcv_modbus_readings.EM_readings[9],rcv_modbus_readings.EM_readings[11],rcv_modbus_readings.EM_readings[10]);
+        snprintf(packet,512, "{\"ref\":\"sensIN\", \"pH\":\"%s\", \"temperatura\":\"%.2f\", \"EC\":\"%.3s\", \"Turb\":\"%.2f\", \"COD\":\"%.2f\" }"
+        ,rcv_i2c_readings.ph, rcv_modbus_readings.temperature, rcv_i2c_readings.ec,rcv_modbus_readings.turbidity,rcv_modbus_readings.COD);
     }
     
     void initialize_values()
@@ -78,19 +70,6 @@ namespace MQTT
         rcv_modbus_readings.COD=0.0;
         rcv_modbus_readings.turbidity=0.0;
         rcv_modbus_readings.temperature=0.0;
-        rcv_modbus_readings.pump_RMP=0;
-        rcv_modbus_readings.EM_readings[0] = 0.0;
-        rcv_modbus_readings.EM_readings[1] = 0.0;
-        rcv_modbus_readings.EM_readings[2] = 0.0;
-        rcv_modbus_readings.EM_readings[3] = 0.0;
-        rcv_modbus_readings.EM_readings[4] = 0.0;
-        rcv_modbus_readings.EM_readings[5] = 0.0;
-        rcv_modbus_readings.EM_readings[6] = 0.0;
-        rcv_modbus_readings.EM_readings[7] = 0.0;
-        rcv_modbus_readings.EM_readings[8] = 0.0;
-        rcv_modbus_readings.EM_readings[9] = 0.0;
-        rcv_modbus_readings.EM_readings[10] = 0.0;
-        rcv_modbus_readings.EM_readings[11] = 0.0;
     }
 
     void taskMQTT(void *pvParameters) // Task de envio de parametros para o broker
@@ -109,16 +88,12 @@ namespace MQTT
             client.loop();
 
             process_data();
-            client.publish("sensors/input", packet);
+            client.publish(ENV_IN_SENSORS_TOPIC, packet);
             #if ENV_MQTT_DEBUG
                 Serial.printf("MQTT: Packet sent: %s",packet);
             #endif
             vTaskDelay(100/portTICK_PERIOD_MS);
 
-            client.publish("sensors/EM", EMPacket);
-            #if ENV_MQTT_DEBUG
-                Serial.printf("MQTT: Packet sent: %s",EMPacket);
-            #endif
             vTaskDelay(ENV_SEND_PERIOD_SEC * 1000 / portTICK_PERIOD_MS);
         }
     }
