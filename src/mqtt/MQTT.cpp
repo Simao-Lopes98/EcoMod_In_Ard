@@ -33,7 +33,7 @@ namespace MQTT
             if (client.connect(clientId.c_str()))
             {
                 process_data();
-                client.publish("sensors/input", packet);
+                client.publish(ENV_IN_SENSORS_TOPIC, packet);
                 #if ENV_MQTT_DEBUG
                     Serial.printf("MQTT: Packet sent: %s",packet);
                 #endif
