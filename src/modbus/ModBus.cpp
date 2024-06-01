@@ -205,16 +205,6 @@ namespace ModBus
         Serial.println("MobBus: Booted");
         while (true)
         {
-            // Change Pump RPM - Function removed as the PUMP is not controlled by this uC
-            // if (uxQueueMessagesWaiting(queues::pump_rpm))
-            // {
-            //     xQueueReceive(queues::pump_rpm, &RPM, 10 / portTICK_PERIOD_MS);
-                
-            //     #if ENV_MODBUS_DEBUG
-            //         Serial.println("Updating pump RPM to: " String(RPM));
-            //     #endif
-            //     write_rpm_pump(RPM);
-            // }
 
             // Readings
             readings.temperature = read_temperature();
