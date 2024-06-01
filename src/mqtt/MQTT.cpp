@@ -8,6 +8,7 @@ namespace MQTT
     queues::I2C_readings_t rcv_i2c_readings;
     queues::Modbus_readings_t rcv_modbus_readings;
     char packet[512];
+    uint16_t msg_sec_period = ENV_SEND_PERIOD_SEC;
 
     void callback(char *topic, byte *payload, unsigned int length)
     {
@@ -92,9 +93,16 @@ namespace MQTT
             #if ENV_MQTT_DEBUG
                 Serial.printf("MQTT: Packet sent: %s",packet);
             #endif
-            vTaskDelay(100/portTICK_PERIOD_MS);
 
-            vTaskDelay(ENV_SEND_PERIOD_SEC * 1000 / portTICK_PERIOD_MS);
+            if(uxQueueMessagesWaiting(queues::msg_period))
+            {
+                xQueueReceive(queues::msg_period,&msg_sec_period,10/portTICK_PERIOD_MS);
+                #if ENV_MQTT_DEBUG
+                    Serial.printf("MQTT: Message sending waiting time updated to: %"PRIu16"\n",msg_sec_period);
+                #endif
+            }
+
+            vTaskDelay(msg_sec_period * 1000 / portTICK_PERIOD_MS);
         }
     }
 }

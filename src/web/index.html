@@ -209,22 +209,22 @@
 			xhr.send();
 		}
 
-		function requestRPMChange() {
-			var RPM = document.getElementById("rpmSlider").value;
+		function requestEnvSec() {
+			var sec = document.getElementById("secSlider").value;
 			var xhr = new XMLHttpRequest();
 			xhr.onreadystatechange = function () {
 				if (xhr.readyState == 4) {
 					if (xhr.status == 200) {
 						var response = xhr.responseText;
-						alert("RPM changed successfully to: " + RPM);
+						alert("Message pause period changed successfully to: " + sec);
 					} else {
-						alert("Error changing RPM: " + xhr.status + " " + xhr.statusText);
+						alert("Error changing message period: " + xhr.status + " " + xhr.statusText);
 					}
 				}
 			};
-			xhr.open("POST", "/changeRPM", true);
+			xhr.open("POST", "/changeSec", true);
 			xhr.setRequestHeader("Content-Type", "application/json");
-			var data = JSON.stringify({ rpm: RPM });
+			var data = JSON.stringify({ periodSec: sec });
 			xhr.send(data);
 		}
 
@@ -253,13 +253,13 @@
 		<button id="restart_uC" type="button" onclick="requestSoftRestart()">Request Restart</button>
 
 		<div class="slider-container">
-			<input type="range" min="0" max="1500" step="1" value="750" class="slider" id="rpmSlider">
-			<p class="slider-label" id="sliderValue">Value: 750</p>
+			<input type="range" min="0" max="900" step="1" value="600" class="slider" id="secSlider">
+			<p class="slider-label" id="sliderValue">Value: 600</p>
 		</div>
 
 		<script>
 			// Get the slider and label elements
-			const slider = document.getElementById("rpmSlider");
+			const slider = document.getElementById("secSlider");
 			const output = document.getElementById("sliderValue");
 
 			// Display the default value on page load
@@ -267,11 +267,11 @@
 
 			// Update the label text when the slider value changes
 			slider.oninput = function () {
-				output.innerHTML = "Value: " + this.value;
+				output.innerHTML = "Seconds: " + this.value;
 			};
 		</script>
 
-		<button id="changeRPMBtn" type="button" onclick="requestRPMChange()">Change Pump RPM</button>
+		<button id="changeSecBtn" type="button" onclick="requestEnvSec()">Change Message Period</button>
 
 		
 	</div>
